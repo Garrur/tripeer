@@ -12,10 +12,18 @@ const Tours = () => {
   const { apiData: tourCount } = useFetch(`${BASE_URL}/tour/count`);
 
   useEffect(() => {
-    const pages = Math.ceil(tourCount / 12);
-    setPageCount(pages);
+    if (tourCount !== undefined && !isNaN(tourCount)) {
+      const pages = Math.ceil(tourCount / 12);
+      setPageCount(pages);
+    } else {
+      console.warn("Invalid tourCount:", tourCount);
+    }
     window.scrollTo(0, 0);
   }, [page, tourCount, tours]);
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
 
   return (
     <div>
@@ -26,10 +34,10 @@ const Tours = () => {
             <div key={tour._id}>
               <TourCard tour={tour} />
             </div>
-          ))}
+          )) || <div>No tours available</div>}
         </div>
         <div className="flex pagination items-center justify-center mt-8 gap-3">
-          {pageCount &&
+          {pageCount > 0 &&
             [...Array(pageCount).keys()].map((number) => (
               <span
                 key={number}
